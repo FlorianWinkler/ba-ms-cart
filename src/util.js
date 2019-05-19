@@ -10,6 +10,8 @@ const userUrl = "http://127.0.0.1:3001";
 const productUrl = "http://127.0.0.1:3002";
 const shoppingCartCollectionName="shoppingCart";
 
+const numPopulateItems = 1000;
+
 let hostname = "unknown_host";
 let mongodbConn=null;
 
@@ -43,7 +45,7 @@ function prepareDatabase() {
             connection.dropDatabase();
             console.log("Dropped DB");
             mongodbConn = connection;
-            //populateDB();
+            populateDB();
         }
     );
 }
@@ -77,8 +79,8 @@ function populateDB() {
     });
 
     function insertNextShoppingCart(){
-        if(nextCartUserId < 100){
-            let randomProduct = Math.floor((Math.random() * 99)).toString();
+        if(nextCartUserId < numPopulateItems){
+            let randomProduct = Math.floor((Math.random() * numPopulateItems-1)).toString();
             let randomQty = Math.floor((Math.random() * 10));
             let cartItem = new ShoppingCartItem(randomProduct,randomQty);
             let cart = new ShoppingCart(nextCartUserId.toString(),[cartItem]);
@@ -103,5 +105,6 @@ module.exports = {
     getHostname: getHostname,
     shoppingCartCollectionName: shoppingCartCollectionName,
     userUrl: userUrl,
-    productUrl: productUrl
+    productUrl: productUrl,
+    numPopulateItems: numPopulateItems
 };

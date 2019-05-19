@@ -11,8 +11,8 @@ let reqcounter = 0;
 
 router.post('/add', function(req, res) {
     reqcounter++;
-    let randomUser = Math.floor((Math.random() * 99)).toString();
-    let randomProduct = Math.floor((Math.random() * 99)).toString();
+    let randomUser = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
+    let randomProduct = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
     let randomQty = Math.floor((Math.random() * 5));
 
     addProduct(randomUser, randomProduct, randomQty, function (upsertedShoppingCart,err) {
@@ -27,7 +27,7 @@ router.post('/add', function(req, res) {
 
 router.get('/get', function(req, res) {
     reqcounter++;
-    let random = Math.floor((Math.random() * 100)).toString();
+    let random = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
     getShoppingCartByUserId(random, function(dbResponse){
         if(dbResponse != null ){
             res.json(dbResponse.shoppingCart);
