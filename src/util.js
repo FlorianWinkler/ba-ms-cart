@@ -4,10 +4,10 @@ const assert = require("assert");
 const ShoppingCart = require("../src/ShoppingCart");
 const ShoppingCartItem = require("../src/ShoppingCartItem");
 
-// const dbUrl = "mongodb://127.0.0.1:27017/monolithDB";
-const dbUrl = "mongodb://10.0.0.166:27017/cartDB";
-const userUrl = "http://127.0.0.1:3001";
-const productUrl = "http://127.0.0.1:3002";
+const dbUrl = "mongodb://cartDB:27017/cartDB";
+// const dbUrl = "mongodb://10.0.0.166:27017/cartDB";
+const userUrl = "http://user:3000";
+const productUrl = "http://product:3000";
 const shoppingCartCollectionName="shoppingCart";
 
 const numPopulateItems = 1000;
