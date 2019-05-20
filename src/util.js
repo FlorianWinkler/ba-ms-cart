@@ -1,14 +1,16 @@
 const exec = require('child_process').exec;
 const MongoClient = require("mongodb").MongoClient;
 const assert = require("assert");
-const ShoppingCart = require("../src/ShoppingCart");
-const ShoppingCartItem = require("../src/ShoppingCartItem");
+const Cart = require("./Cart");
+const CartItem = require("./CartItem");
 
 const dbUrl = "mongodb://ba-ms-cartdb:27017/cartdb";
-// const dbUrl = "mongodb://10.0.0.166:27017/cartdb";
 const userUrl = "http://ba-ms-user:3000";
 const productUrl = "http://ba-ms-product:3000";
-// const shoppingCartCollectionName="shoppingCart";
+// const dbUrl = "mongodb://10.0.0.166:27017/cartdb";
+// const userUrl = "http://localhost:3000";
+// const productUrl = "http://localhost:3001";
+// const cartCollectionName="cart";
 
 const numPopulateItems = 1000;
 const numTenants = 5;
@@ -78,20 +80,20 @@ function populateDB() {
 //--------insert Shopping Carts--------
     getDatabaseCollection(tenantBaseString+nextTenantId, function (collection) {
         cartCollection = collection;
-        insertNextShoppingCart()
+        insertNextCart()
     });
 
-    function insertNextShoppingCart(){
+    function insertNextCart(){
         if(nextCartUserId < numPopulateItems){
             let randomProduct = Math.floor((Math.random() * numPopulateItems-1)).toString();
             let randomQty = Math.floor((Math.random() * 10));
-            let cartItem = new ShoppingCartItem(randomProduct,randomQty);
-            let cart = new ShoppingCart(nextCartUserId.toString(),[cartItem]);
+            let cartItem = new CartItem(randomProduct,randomQty);
+            let cart = new Cart(nextCartUserId.toString(),[cartItem]);
             cartCollection.insertOne({
-                shoppingCart: cart
+                cart: cart
             }, function (err, res) {
                 nextCartUserId++;
-                insertNextShoppingCart();
+                insertNextCart();
             });
         }else {
             if(nextTenantId<numTenants-1) {
@@ -100,7 +102,7 @@ function populateDB() {
                 nextTenantId++;
                 getDatabaseCollection(tenantBaseString + nextTenantId, function (collection) {
                         cartCollection = collection;
-                        insertNextShoppingCart();
+                        insertNextCart();
                     }
                 );
             }

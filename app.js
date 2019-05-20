@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const app = express();
 
 const index = require('./routes/index');
-const cart = require('./routes/shoppingCart');
+const cart = require('./routes/cart');
 
 // Generic application setup
 app.use(logger('dev'));
