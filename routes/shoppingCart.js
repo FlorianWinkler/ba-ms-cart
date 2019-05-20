@@ -14,8 +14,9 @@ router.post('/add', function(req, res) {
     let randomUser = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
     let randomProduct = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
     let randomQty = Math.floor((Math.random() * 5));
-
-    addProduct(randomUser, randomProduct, randomQty, function (upsertedShoppingCart,err) {
+    let randomTenant = util.tenantBaseString+Math.floor((Math.random() * util.numTenants));
+    // console.log(randomTenant);
+    addProduct(randomUser, randomProduct, randomQty, randomTenant, function (upsertedShoppingCart,err) {
         if(err !== true) {
             res.json(upsertedShoppingCart);
         }
@@ -27,8 +28,10 @@ router.post('/add', function(req, res) {
 
 router.get('/get', function(req, res) {
     reqcounter++;
-    let random = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
-    getShoppingCartByUserId(random, function(dbResponse){
+    let randomUserId = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
+    let randomTenant = util.tenantBaseString+Math.floor((Math.random() * util.numTenants));
+    // console.log(randomTenant);
+    getShoppingCartByUserId(randomUserId, randomTenant, function(dbResponse){
         if(dbResponse != null ){
             res.json(dbResponse.shoppingCart);
         }
@@ -50,14 +53,14 @@ router.get('/get', function(req, res) {
 //     });
 // });
 
-function addProduct(userId, productId, qty, callback) {
+function addProduct(userId, productId, qty, tenant, callback) {
 
     let validUser=false;
     let validProduct=false;
 
     // util.getDatabaseCollection(util.userCollectionName,
     Request.get({
-        url: util.userUrl+"/user/get/"+userId,
+        url: util.userUrl+"/user/get/"+tenant+"/"+userId,
         json: true
         },
         function (error, response, body) {
@@ -72,7 +75,7 @@ function addProduct(userId, productId, qty, callback) {
             //Check if the Product ID is from a valid Product
             // util.getDatabaseCollection(util.productCollectionName,
             Request.get({
-                    url: util.productUrl+"/product/get/"+productId,
+                    url: util.productUrl+"/product/get/"+tenant+"/"+productId,
                     json: true
                 },
                 function (error, response, body) {
@@ -83,7 +86,7 @@ function addProduct(userId, productId, qty, callback) {
                     // console.log("Valid Product" + product);
 
                     //if User ID and Product ID are valid, insert the product to the shopping-cart
-                    util.getDatabaseCollection(util.shoppingCartCollectionName, function (collection) {
+                    util.getDatabaseCollection(tenant, function (collection) {
                         let sci = new ShoppingCartItem(productId, qty);
                         collection.updateOne(
                             {"shoppingCart.userId": userId},
@@ -97,7 +100,7 @@ function addProduct(userId, productId, qty, callback) {
                                     //conn.close();
                                     //console.log(err);
                                     console.log("Caught duplicate Key error while writing document! Retry...");
-                                    setTimeout(addProduct, 100, userId, productId, qty, callback);
+                                    setTimeout(addProduct, 100, userId, productId, qty, tenant, callback);
                                 } else {
                                     assert.equal(err, null);
                                     // nextProductId++;
@@ -120,8 +123,8 @@ function addProduct(userId, productId, qty, callback) {
     });
 }
 
-function getShoppingCartByUserId(userId, callback) {
-    util.getDatabaseCollection(util.shoppingCartCollectionName,(async function (collection) {
+function getShoppingCartByUserId(userId, tenant, callback) {
+    util.getDatabaseCollection(tenant,(async function (collection) {
         let retShoppingCart = await collection.findOne({"shoppingCart.userId": userId});
         //console.log(retUser);
         callback(retShoppingCart);

@@ -4,13 +4,15 @@ const assert = require("assert");
 const ShoppingCart = require("../src/ShoppingCart");
 const ShoppingCartItem = require("../src/ShoppingCartItem");
 
-const dbUrl = "mongodb://cartDB:27017/cartDB";
-// const dbUrl = "mongodb://10.0.0.166:27017/cartDB";
-const userUrl = "http://user:3000";
-const productUrl = "http://product:3000";
-const shoppingCartCollectionName="shoppingCart";
+// const dbUrl = "mongodb://cartDB:27017/cartdb";
+const dbUrl = "mongodb://10.0.0.166:27017/cartdb";
+const userUrl = "http://localhost:3000";
+const productUrl = "http://localhost:3001";
+// const shoppingCartCollectionName="shoppingCart";
 
 const numPopulateItems = 1000;
+const numTenants = 5;
+const tenantBaseString = "tenant";
 
 let hostname = "unknown_host";
 let mongodbConn=null;
@@ -71,9 +73,10 @@ function getHostname(){
 function populateDB() {
     let cartCollection;
     let nextCartUserId=0;
+    let nextTenantId=0;
 
 //--------insert Shopping Carts--------
-    getDatabaseCollection(shoppingCartCollectionName, function (collection) {
+    getDatabaseCollection(tenantBaseString+nextTenantId, function (collection) {
         cartCollection = collection;
         insertNextShoppingCart()
     });
@@ -90,8 +93,21 @@ function populateDB() {
                 nextCartUserId++;
                 insertNextShoppingCart();
             });
-        }else{
-            console.log("Shopping Carts inserted");
+        }else {
+            if(nextTenantId<numTenants-1) {
+                console.log("Carts inserted for " + tenantBaseString + nextTenantId);
+                nextCartUserId = 0;
+                nextTenantId++;
+                getDatabaseCollection(tenantBaseString + nextTenantId, function (collection) {
+                        cartCollection = collection;
+                        insertNextShoppingCart();
+                    }
+                );
+            }
+            else{
+                console.log("Carts inserted for " + tenantBaseString + nextTenantId);
+                console.log("Finished Cart insert");
+            }
         }
     }
 }
@@ -103,8 +119,9 @@ module.exports = {
     prepareDatabase: prepareDatabase,
     setHostname: setHostname,
     getHostname: getHostname,
-    shoppingCartCollectionName: shoppingCartCollectionName,
     userUrl: userUrl,
     productUrl: productUrl,
-    numPopulateItems: numPopulateItems
+    numPopulateItems: numPopulateItems,
+    numTenants: numTenants,
+    tenantBaseString: tenantBaseString
 };
