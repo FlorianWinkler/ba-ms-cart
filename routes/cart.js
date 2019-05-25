@@ -9,6 +9,15 @@ const util = require('../src/util');
 
 let reqcounter = 0;
 
+router.get('/', function(req, res, next) {
+    res.send('Cart Service running!');
+});
+
+router.get('/preparedb', function(req, res, next) {
+    util.prepareDatabase();
+    res.status(200).end();
+});
+
 router.post('/add', function(req, res) {
     reqcounter++;
     let randomUser = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
