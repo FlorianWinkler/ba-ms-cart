@@ -5,8 +5,8 @@ const Cart = require("./Cart");
 const CartItem = require("./CartItem");
 
 const dbUrl = "mongodb://ba-ms-cartdb-svc:27017/cartdb";
-const userUrl = "http://ba-ms-user-svc:3000";
-const productUrl = "http://ba-ms-product-svc:3000";
+const userUrl = "http://ba-ms-user-svc";
+const productUrl = "http://ba-ms-product-svc";
 // const dbUrl = "mongodb://10.0.0.166:27017/cartdb";
 // const userUrl = "http://40.114.136.155:3000";
 // const productUrl = "http://104.214.229.215:3000";

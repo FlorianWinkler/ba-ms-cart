@@ -63,7 +63,6 @@ router.get('/get', function(req, res) {
 // });
 
 function addProduct(userId, productId, qty, tenant, callback) {
-
     let validUser=false;
     let validProduct=false;
 
