@@ -15,7 +15,7 @@ router.get('/', function(req, res, next) {
 
 router.get('/preparedb', function(req, res, next) {
     util.prepareDatabase();
-    res.status(200).end();
+    res.send('Populating User DB...');
 });
 
 router.post('/add', function(req, res) {
