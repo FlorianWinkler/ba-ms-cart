@@ -15,7 +15,7 @@ router.get('/', function(req, res, next) {
 
 router.get('/preparedb', function(req, res, next) {
     util.prepareDatabase();
-    res.send('Populating User DB...');
+    res.send('Populating Cart DB...');
 });
 
 router.post('/add', function(req, res) {
@@ -63,72 +63,65 @@ router.get('/get', function(req, res) {
 // });
 
 function addProduct(userId, productId, qty, tenant, callback) {
-    let validUser=false;
-    let validProduct=false;
 
     // util.getDatabaseCollection(util.userCollectionName,
     Request.get({
-        url: util.userUrl+"/user/get/"+tenant+"/"+userId,
-        json: true
+            url: util.userUrl + "/user/get/" + tenant + "/" + userId,
+            json: true
         },
         function (error, response, body) {
-        //first check if the User ID is of a valid User
-        let user = body.user;
-        // console.log("User ID: "+userId);
-        // console.log("User: "+user);
-        if (user != null) {
-            validUser = true;
-            // console.log("Valid User:" + user);
+            //first check if the User ID is of a valid User
+            // console.log("User ID: "+userId);
+            // console.log("User: "+body.user);
+            if (response.statusCode !== 400) {
+                // console.log("Valid User:" + user);
 
-            //Check if the Product ID is from a valid Product
-            // util.getDatabaseCollection(util.productCollectionName,
-            Request.get({
-                    url: util.productUrl+"/product/get/"+tenant+"/"+productId,
-                    json: true
-                },
-                function (error, response, body) {
-                let product = body.product;
-                // console.log("Product ID: "+productId);
-                if (product != null) {
-                    validProduct = true;
-                    // console.log("Valid Product" + product);
+                //Check if the Product ID is from a valid Product
+                // util.getDatabaseCollection(util.productCollectionName,
+                Request.get({
+                        url: util.productUrl + "/product/get/" + tenant + "/" + productId,
+                        json: true
+                    },
+                    function (error, response, body) {
+                        // let product = body.product;
+                        // console.log("Product ID: "+productId);
+                        if (response.statusCode !== 400) {
+                            // console.log("Valid Product" + product);
 
-                    //if User ID and Product ID are valid, insert the product to the shopping-cart
-                    util.getDatabaseCollection(tenant, function (collection) {
-                        let sci = new CartItem(productId, qty);
-                        collection.updateOne(
-                            {"cart.userId": userId},
-                            {
-                                $set: {"cart.userId": userId},
-                                $addToSet: {"cart.items": sci}
-                            },
-                            {upsert: true},
-                            function (err, res) {
-                                if (err != null && err.code === 11000) {
-                                    //conn.close();
-                                    //console.log(err);
-                                    console.log("Caught duplicate Key error while writing document! Retry...");
-                                    setTimeout(addProduct, 100, userId, productId, qty, tenant, callback);
-                                } else {
-                                    assert.equal(err, null);
-                                    // nextProductId++;
-                                    callback({
-                                        userId: userId,
-                                        addedItem: sci
+                            //if User ID and Product ID are valid, insert the product to the shopping-cart
+                            util.getDatabaseCollection(tenant, function (collection) {
+                                let sci = new CartItem(productId, qty);
+                                collection.updateOne(
+                                    {"cart.userId": userId},
+                                    {
+                                        $set: {"cart.userId": userId},
+                                        $addToSet: {"cart.items": sci}
+                                    },
+                                    {upsert: true},
+                                    function (err, res) {
+                                        if (err != null && err.code === 11000) {
+                                            //conn.close();
+                                            //console.log(err);
+                                            console.log("Caught duplicate Key error while writing document! Retry...");
+                                            setTimeout(addProduct, 100, userId, productId, qty, tenant, callback);
+                                        } else {
+                                            assert.equal(err, null);
+                                            // nextProductId++;
+                                            callback({
+                                                userId: userId,
+                                                addedItem: sci
+                                            });
+                                        }
                                     });
-                                }
                             });
+                        } else {
+                            callback(null, true);
+                        }
                     });
-                }
-                else{
-                    callback(null,true);
-                }
-            });
-        }
-        else{
-            callback(null,true);
-        }
-    });
+            } else {
+                callback(null, true);
+            }
+        });
 }
 
 function getCartByUserId(userId, tenant, callback) {

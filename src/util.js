@@ -7,13 +7,13 @@ const CartItem = require("./CartItem");
 const dbUrl = "mongodb://ba-ms-cartdb-svc:27017/cartdb";
 const userUrl = "http://ba-ms-user-svc";
 const productUrl = "http://ba-ms-product-svc";
-// const dbUrl = "mongodb://10.0.0.166:27017/cartdb";
-// const userUrl = "http://40.114.136.155:3000";
-// const productUrl = "http://104.214.229.215:3000";
+// const dbUrl = "mongodb://10.0.0.206:27017/cartdb";
+// const userUrl = "http://localhost:3000";
+// const productUrl = "http://localhost:3001";
 // const cartCollectionName="cart";
 
 const numPopulateItems = 1000;
-const numTenants = 1;
+const numTenants = 5;
 const tenantBaseString = "tenant";
 
 let hostname = "unknown_host";
