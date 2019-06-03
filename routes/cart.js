@@ -18,6 +18,15 @@ router.get('/preparedb', function(req, res, next) {
     res.send('Populating Cart DB...');
 });
 
+router.get('/getconfig', function(req, res, next) {
+    res.json({
+        hostname: util.getHostname(),
+        numTenants: util.numTenants,
+        numPopulateItems: util.numPopulateItems,
+        tenantBaseString: util.tenantBaseString
+    });
+});
+
 router.post('/add', function(req, res) {
     reqcounter++;
     let randomUser = Math.floor((Math.random() * util.numPopulateItems-1)).toString();
