@@ -13,7 +13,7 @@ const productUrl = "http://ba-ms-product-svc";
 // const cartCollectionName="cart";
 
 const numPopulateItems = 1000;
-const numTenants = 5;
+const numTenants = 15;
 const tenantBaseString = "tenant";
 
 let hostname = "unknown_host";
